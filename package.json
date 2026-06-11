@@ -3,15 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "node scripts/copy-umbra-assets.mjs && node scripts/patch-umbra-widget.mjs"
   },
   "dependencies": {
+    "@solana/kit": "^6.9.0",
+    "@solana/react": "^6.9.0",
+    "@tanstack/react-query": "^5.101.0",
+    "@umbra-privacy/sdk": "^5.0.0-rc.4",
+    "@umbra-privacy/widget": "^0.1.0",
+    "@wallet-standard/react": "^1.0.3",
+    "buffer": "^6.0.3",
     "next": "16.2.9",
+    "process": "^0.11.10",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "snarkjs": "^0.7.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

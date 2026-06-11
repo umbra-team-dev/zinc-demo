@@ -1,26 +1,105 @@
 @import "tailwindcss";
+/* The widget stylesheet ships an unscoped preflight (button/input resets) —
+   confine it to the `components` layer so our `utilities` layer wins. */
+@import "@umbra-privacy/widget/styles.css" layer(components);
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #070708;
+  --surface: #121317;
+  --surface-2: #17181d;
+  --line: #232429;
+  --line-soft: #18191d;
+  --text: #ededee;
+  --muted: #8a8f98;
+  --faint: #5b5f66;
+  --orange: #f97316;
+  --orange-hot: #fb8c2e;
+  --gold: #e8a33d;
+  --green: #2ebd85;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-ember: var(--orange);
+  --color-ember-hot: var(--orange-hot);
+  --color-gold: var(--gold);
+  --color-mint: var(--green);
+  --font-display: var(--font-chakra);
+  --font-mono: var(--font-plex-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-chakra), "Chakra Petch", sans-serif;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--orange) 70%, transparent);
+  color: #fff;
+}
+
+/* Hide the widget's own "Umbra Wallet" brand header — the page chrome
+   already provides branding. (Unlayered, so it wins over widget styles.) */
+.uw-root > .mb-5.flex.items-center.gap-2\.5 {
+  display: none;
+}
+
+/* ── Backdrop layers ─────────────────────────────────────────────── */
+
+.zinc-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 85% 70% at 50% 40%, black 25%, transparent 75%);
+}
+
+.zinc-noise {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* ── Motion ──────────────────────────────────────────────────────── */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.rise {
+  animation: rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.blink {
+  animation: blink 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .blink {
+    animation: none;
+  }
 }

@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# zinc-demo
 
-## Getting Started
+Next.js app that mounts the [`@umbra-privacy/widget`](https://www.npmjs.com/package/@umbra-privacy/widget)
+centered on screen, re-themed to the ZINC design language (near-black,
+molten orange `#f97316`, Chakra Petch / IBM Plex Mono, tight radii, HUD
+corner brackets).
 
-First, run the development server:
+## Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install        # postinstall copies ZK worker assets + patches the widget dist
+npm run dev        # webpack dev server on :3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Set `NEXT_PUBLIC_RPC_URL` in `.env.local` — use a **Helius** endpoint
+(`https://mainnet.helius-rpc.com/?api-key=...`): the widget resolves token
+metadata via the Helius DAS API, and the public RPC 403s those calls.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Connect a Wallet Standard wallet (Phantom, Solflare, …) to mount the widget.
+- `http://localhost:3000/?demo=1` mounts it with an ephemeral keypair signer
+  instead (no wallet needed; keys are discarded on reload).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Structure
 
-## Learn More
+- [src/components/zinc-terminal.tsx](src/components/zinc-terminal.tsx) — page chrome + wallet connect (client-only via `dynamic ssr:false` in [widget-stage.tsx](src/components/widget-stage.tsx))
+- [src/components/umbra-vault.tsx](src/components/umbra-vault.tsx) — Wallet Standard account → `WidgetSigner` adapter → `<UmbraWidgetInline>`
+- [src/lib/zinc.ts](src/lib/zinc.ts) — ZINC theme mapped onto the widget `ui` prop
+- [src/lib/polyfills.ts](src/lib/polyfills.ts) — Buffer/process/global shims (must evaluate before any `@umbra-privacy/*` import)
 
-To learn more about Next.js, take a look at the following resources:
+## Workarounds for `@umbra-privacy/widget@0.1.0` packaging issues
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+These live in this repo until fixed upstream; remove them once a fixed
+widget version ships.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Dist crashes at import** — the Vite lib build stubs node-fetch's
+   `stream` module to a frozen `{}`, and node-fetch reads
+   `Stream.Readable.prototype` at module scope. Patched by
+   [scripts/patch-umbra-widget.mjs](scripts/patch-umbra-widget.mjs) (postinstall).
+2. **ZK worker referenced by root-absolute URL** (`/assets/zk-proof-worker-<hash>.js`)
+   — bundlers can't resolve it. webpack: remapped to the package file via
+   `NormalModuleReplacementPlugin` in [next.config.ts](next.config.ts); plus
+   [scripts/copy-umbra-assets.mjs](scripts/copy-umbra-assets.mjs) serves a copy from
+   `public/assets/` for the runtime-URL path. (This is also why the app runs
+   `next dev/build --webpack` — Turbopack hard-fails on the unresolvable URL.)
+3. **`styles.css` ships an unscoped Tailwind v3 preflight** that resets the
+   host page's buttons/inputs — imported via
+   `@import "@umbra-privacy/widget/styles.css" layer(components)` in
+   [globals.css](src/app/globals.css) so host utilities win.
+4. **`snarkjs` is required at module scope** by `@umbra-privacy/sdk`'s
+   zk-prover chunk despite being an optional peer — installed explicitly.
