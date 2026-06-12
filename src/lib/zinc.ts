@@ -32,5 +32,15 @@ export const ZINC_UI: WidgetUiConfig = {
     primary: "var(--font-chakra), 'Chakra Petch', sans-serif",
     secondary: "var(--font-plex-mono), 'IBM Plex Mono', monospace",
   },
+  // Tab row (0.1.2+): flat industrial segmented bar, not rounded pills —
+  // recessed steel row, hairline borders, tight corners.
+  tabs: {
+    rowBg: "#0f1013",
+    rowPadding: "3px",
+    bg: "transparent",
+    activeBg: "#232429",
+    border: "#26272d",
+    radius: "4px",
+  },
   rounding: { sm: "4px", md: "8px", lg: "12px" },
 };

@@ -13,7 +13,7 @@
     "@solana/react": "^6.9.0",
     "@tanstack/react-query": "^5.101.0",
     "@umbra-privacy/sdk": "^5.0.0-rc.4",
-    "@umbra-privacy/widget": "^0.1.1",
+    "@umbra-privacy/widget": "^0.1.2",
     "@wallet-standard/react": "^1.0.3",
     "buffer": "^6.0.3",
     "next": "16.2.9",

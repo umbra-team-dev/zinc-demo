@@ -35,3 +35,6 @@ metadata via the Helius DAS API, and the public RPC 403s those calls.
   [globals.css](src/app/globals.css) so host utilities win.
 - **`snarkjs`** is required at module scope by `@umbra-privacy/sdk`'s
   zk-prover chunk despite being an optional peer — installed explicitly.
+- Widget **0.1.2+** spawns its ZK workers from inlined Blob URLs (no asset
+  files to serve) and exposes the `ui.tabs` block used in
+  [zinc.ts](src/lib/zinc.ts) for the flat ZINC-style tab bar.
